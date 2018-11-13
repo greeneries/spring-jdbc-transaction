@@ -16,9 +16,23 @@ public class EmpController {
 	@Autowired
 	private EmpDao empDao;
 
+//	http://localhost:8080/transaction/
+	@RequestMapping(value="/", method=RequestMethod.GET)
+	public String getAll1(Model model) {
+		// DAO에게 데이터를 구해달라고 요청한다.
+		List<Emp> emps = empDao.findAll();
+		// Model 객체에 데이터를 추가하면 
+		// 스프링이 HttpServletRequest 객체로 옮긴다.
+		// HttpServletRequest 객체에 존재하는 데이터는 
+		// JSP에서 접근하여 사용할 수 있다.
+		model.addAttribute("emps", emps);
+		// 다음으로 연동할 JSP 뷰 파일명을 리턴한다.
+		return "emp-list";
+	}
+	
 //	http://localhost:8080/transaction/emps
 	@RequestMapping(value="/emps", method=RequestMethod.GET)
-	public String getAll(Model model) {
+	public String getAll2(Model model) {
 		// DAO에게 데이터를 구해달라고 요청한다.
 		List<Emp> emps = empDao.findAll();
 		// Model 객체에 데이터를 추가하면 
