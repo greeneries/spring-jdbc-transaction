@@ -1,4 +1,4 @@
-# spring-legacy-jdbc1
+# spring-jdbc-transaction
 
 ##### 먼저 Database 생성하기
 ```
