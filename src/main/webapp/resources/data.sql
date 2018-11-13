@@ -1,7 +1,3 @@
-INSERT INTO emp(ename, job, sal) VALUES('홍길동', '도적', 800);
-INSERT INTO emp(ename, job, sal) VALUES('일지매', '의적', 700);
-INSERT INTO emp(ename, job, sal) VALUES('임꺽정', '산적', 900);
-
--- 추가 연습용이다.
--- INSERT INTO emp(ename, job, sal) VALUES('구운몽', '백수', 999);
--- INSERT INTO emp(ename, job, sal) VALUES('온달', '장군', 600);
+INSERT INTO emp(ename, job, sal) VALUES('Lee Sun Sin', 'Jang gun', 800);
+INSERT INTO emp(ename, job, sal) VALUES('Gang Gam Chan', 'Jang gun', 700);
+INSERT INTO emp(ename, job, sal) VALUES('Eulji Mundeok', 'Jang gun', 900);
