@@ -52,8 +52,73 @@
 		<constructor-arg ref="dataSource"/>
 	</bean>
 	
+	
+	<!-- 
+		어드바이스 클래스를 만드는 대신 어드바이스 객체를 위한 설정을 한다.
+		트랜잭션 로직은 누가 짜도 똑같은 전형적인 로직이므로 로직은 알려줄 
+		필요가 없다. 대신, DAO 메소드마다 어떻게 트랜잭션 속성을 적용할 
+		것인지를 설정한다.
+	 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<!-- 
+				조회는 테이블의 칼럼의 상태를 변화시키지 않는다.
+				read-only="true" 설정으로 격리시간을 최소화 하는 것이 좋다.
+	
+			 -->
+			<tx:method name="find*" isolation="DEFAULT" propagation="REQUIRED"/>
+			<tx:method name="select*" read-only="false" timeout="-1"/> <!-- timeout은  -1은 무제한으로 작업을 기다리겠다는 의미-->
+			<!-- 
+				위에서 설정한 속성은 모두 기본값이다.
+			 -->
+			 
+			 
+			<tx:method name="get*" read-only="true"/> <!-- read-only:true는 조회할때 blocking을 하지 말아달라. -->
+			<tx:method name="search*" timeout="30"/> <!-- 30초 안에 작업이 끝나지 않으면 rollback 하겠다. -->
+			
+			<!-- 
+				unchecked 예외는 try ~ catch 구문이 강제되지 않기 때문에 
+				unchecked 예외는 개발자가 미쳐 예외를 처리하는 코드를 배치하지 못 할 수 도 있다.
+				그래서 스프링은 unchecked 예외가 발생하면 개발자가 인지하지 못하는 상태이기 때문에
+				rollback을 허용한다.
+			
+				checked 예외는 try ~ catch로 강제되기 때문에 개발자가 rollback여부를 결정
+				=> 즉 개발자의 판단에 따른다. 
+			
+				입력, 수정, 삭제는 테이블의 칼럼의 상태를 변화시킨다.
+				트랜잭션 범위안에서 RuntimeException(언체크드 예외)이 발생하면 롤백한다.
+				트랜잭션 범위안에서 Exception(체크드 예외)이 발생하면 커밋한다.
+				rollback-for="RuntimeException" 설정은 기본값이다.
+				rollback-for="Exception" 설정을 하게되면 
+				Exception(체크드 예외)이 발생해도 롤백한다.
+				
+				spring jdbc를 사용하면 checked 예외는 발생하지 않는다. 
+				그러므로 어떤 예외가 발생하면 unchecked 예외이기 때문에 rollback 된다. 
+				그러나 비즈니스 로직을 사용하다보면 개발자가 코드가 추가되고
+				spring jdbc 기술외에 사용하게 되면 checked 예외가 발생할 확률이 발생할 수 있다.
+			 -->
+			<tx:method name="insert*" rollback-for="Exception"/>
+			<tx:method name="update*" rollback-for="RuntimeException"/>
+			<tx:method name="delete*"/>
+			
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>
+		<!-- 
+			트랜잭션 어드바이스는 어라운드 어드바이스 이므로 aop:advisor 태그를 
+			사용하여 설정한다. 
+		 -->
+		<aop:advisor advice-ref="txAdvice" 
+			pointcut="execution(* com.example.demo.dao..*(..))"/>
+	</aop:config>
+	
+	
+	
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource"/>
 	</bean>
+	
+	<tx:annotation-driven proxy-target-class="true" transaction-manager="transactionManager"/>
 	
 </beans>
