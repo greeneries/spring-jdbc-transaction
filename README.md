@@ -1,6 +1,6 @@
 # spring-jdbc-transaction
 
-##### 먼저 Database 생성하기
+##### 먼저 MariaDB 설치 후 Database 생성하기
 ```
  create database topcredue;
  use topcredue;
